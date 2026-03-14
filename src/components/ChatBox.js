@@ -12,14 +12,18 @@ export default function ChatBox() {
     if (!message) return;
 
     const userMsg = { role: "user", text: message };
-    setChat((prev) => [...prev, userMsg]);
 
-    const reply = await sendMessage(message);
-
-    const aiMsg = { role: "ai", text: reply };
-    setChat((prev) => [...prev, aiMsg]);
+    setChat((prev) => [...prev, userMsg, { role: "ai", text: "" }]);
 
     setMessage("");
+
+    await sendMessage(message, (partial) => {
+      setChat((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1].text = partial;
+        return updated;
+      });
+    });
   };
 
   return (
